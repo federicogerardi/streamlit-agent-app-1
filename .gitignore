@@ -33,6 +33,9 @@ env/
 .streamlit/cache/
 .streamlit/.streamlit/
 
+# Documentation (local only)
+docs/
+
 # IDE
 .vscode/
 .idea/
