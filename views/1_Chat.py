@@ -3,6 +3,7 @@ from utils.auth import require_login
 from utils.api import get_openrouter_client
 from utils.permissions import can_use_model, get_daily_limit
 from utils.user_management import get_message_count_today, increment_message_count
+from utils.session_persistence import save_session_messages
 
 # Protezione pagina
 require_login()
@@ -67,6 +68,9 @@ def stream_llm_response(prompt: str):
             
             # Aggiorna lo stato della sessione solo dopo aver completato lo streaming
             st.session_state.messages.append({"role": "assistant", "content": full_response})
+            
+            # Salva i messaggi in persistenza
+            save_session_messages(user_email, st.session_state.messages)
             
     except Exception as e:
         status_code = getattr(e, "status_code", None)

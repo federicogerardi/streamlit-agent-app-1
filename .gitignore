@@ -30,6 +30,8 @@ env/
 # Streamlit
 .streamlit/secrets.toml
 .streamlit/users.json
+.streamlit/auth_state.json
+.streamlit/sessions/
 .streamlit/cache/
 .streamlit/.streamlit/
 

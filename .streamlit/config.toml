@@ -1,0 +1,97 @@
+# ============================================================================
+# Configurazione Streamlit per AI Chat Hub
+# Documentazione: https://docs.streamlit.io/library/advanced-features/configuration
+# ============================================================================
+
+[theme]
+# Tema dell'applicazione (light | dark)
+primaryColor = "#0066cc"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f0f2f6"
+textColor = "#262730"
+font = "sans serif"
+
+# Modalità scura (commenta per usare light)
+# base = "dark"
+# primaryColor = "#1f77e2"
+# backgroundColor = "#0e1117"
+# secondaryBackgroundColor = "#161b22"
+# textColor = "#c9d1d9"
+
+[client]
+# Mostra la toolbar con pulsante di reload e settings
+showErrorDetails = true
+toolbarMode = "viewer"
+
+[logger]
+# Livello di logging
+level = "info"
+
+# Log dei messaggi su file (opzionale)
+# logMessageLimit = 500
+
+[server]
+# Porta di ascolto
+port = 8501
+
+# Indirizzo bind
+address = "localhost"
+
+# Consenti accesso da tutti gli indirizzi (utile per reverse proxy)
+# headless = true
+
+# Max size per upload in MB
+maxUploadSize = 200
+
+# CORS - Consenti richieste da certi domini
+# Decommentare se necessario per produzione
+# enableCORS = false
+# enableXsrfProtection = true
+
+[mapbox]
+# Token Mapbox (se usi visualizzazioni geografiche)
+# token = "YOUR_MAPBOX_TOKEN"
+
+[browser]
+# Tipo di browser
+# ("serverAddress" | "gatherUsageStats")
+gatherUsageStats = false
+
+[runner]
+# Magic commands (% o @)
+magicEnabled = true
+
+# Rerun dello script quando cambia un file
+fastReruns = true
+
+[ui]
+# Configurazioni UI
+hideTopBar = false
+
+[cache]
+# TTL per cache (secondi) - solo per reference, il valore reale è nel codice
+# maxEntries = 1000
+
+# ============================================================================
+# PRODUZIONE: Impostazioni consigliate (decommentare per deploy)
+# ============================================================================
+
+# [server]
+# port = 8501
+# address = "0.0.0.0"              # Ascolta su tutte le interfacce
+# baseUrlPath = "/"                # Path base se dietro reverse proxy
+# headless = true                  # No UI browser
+# runOnSave = false                # Non auto-reload
+
+# [client]
+# toolbarMode = "minimal"           # Toolbar minimalista
+# showErrorDetails = false          # Nascondi dettagli errori agli utenti
+
+# [logger]
+# level = "warning"                 # Log meno verboso
+
+# [browser]
+# gatherUsageStats = false          # Privacy
+# serverAddress = "your-domain.com" # Indirizzo pubblico
+
+# ============================================================================

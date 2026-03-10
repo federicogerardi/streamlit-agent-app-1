@@ -2,14 +2,23 @@ import streamlit as st
 import httpx
 import urllib.parse
 from utils.user_management import register_user, get_user
+from utils.auth_persistence import load_auth_state, save_auth_state, clear_auth_state, is_auth_valid
 
 def require_login():
     """
     Gestisce il flusso di OAuth2/OIDC con Google, e verifica il dominio autorizzato.
     Interrompe l'esecuzione dell'app se l'utente non è loggato usando st.stop().
     """
-    # Se già autenticato, procedi
+    # 1. Verifica se già autenticato in session_state
     if st.session_state.get("is_logged_in"):
+        return
+    
+    # 2. Verifica se autenticazione è salvata in persistenza
+    if is_auth_valid():
+        auth_data = load_auth_state()
+        st.session_state.is_logged_in = True
+        st.session_state.user_email = auth_data.get("user_email")
+        st.session_state.user_role = auth_data.get("user_role")
         return
 
     # Recupero credenziali dai secrets
@@ -65,6 +74,9 @@ def require_login():
                 st.session_state.user_email = user_email
                 st.session_state.user_role = user_data["role"]
                 
+                # Salva lo stato di autenticazione in persistenza
+                save_auth_state(user_email, user_data["role"])
+                
                 # Pulizia della barra degli indirizzi dal parametro 'code' usabile una sola volta
                 st.query_params.clear()
                 st.success(f"Benvenuto, {user_email}! (Ruolo: {user_data['role'].upper()})")
@@ -107,9 +119,12 @@ def require_login():
 
 def logout():
     """
-    Effettua il logout forzatamente svuotando lo stato della sessione e l'URL
+    Effettua il logout forzatamente svuotando lo stato della sessione, l'URL e la persistenza
     """
     st.session_state.is_logged_in = False
     st.session_state.user_email = None
+    st.session_state.user_role = None
+    # Cancella lo stato di autenticazione salvato
+    clear_auth_state()
     st.query_params.clear()
     st.rerun()

@@ -3,6 +3,7 @@ from utils.auth import require_login
 from utils.api import fetch_available_models
 from utils.permissions import get_role_permissions, check_permission, ROLES
 from utils.user_management import get_all_users, change_user_role
+from utils.session_persistence import save_session_config, clear_session
 
 # Protezione pagina
 require_login()
@@ -28,11 +29,14 @@ if not available_models:
     st.warning(f"Nessun modello disponibile per il ruolo '{user_role}'.")
     available_models = all_available_models  # Fallback ai modelli di default
 
-# Callback per sincronizzare lo stato con i query parameters
+# Callback per sincronizzare lo stato con i query parameters e salvare in persistenza
 def update_query_params():
     st.query_params.update(
         {"model": st.session_state.active_model, "temp": str(st.session_state.temperature)}
     )
+    # Salva la configurazione in persistenza
+    user_email = st.session_state.get('user_email')
+    save_session_config(user_email, st.session_state.active_model, st.session_state.temperature)
 
 # --- Impostazioni Generali ---
 st.header("Modello")
@@ -69,9 +73,27 @@ st.divider()
 
 # 3. Gestione Dati
 st.header("Gestione Dati")
-if st.button("🗑️ Cancella Cronologia Chat", type="primary"):
-    st.session_state.messages = []
-    st.success("La cronologia della chat è stata eliminata.")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    if st.button("🗑️ Cancella Cronologia Chat", type="primary"):
+        user_email = st.session_state.get('user_email')
+        st.session_state.messages = []
+        # Salva la cronologia vuota in persistenza
+        from utils.session_persistence import save_session_messages
+        save_session_messages(user_email, [])
+        st.success("La cronologia della chat è stata eliminata.")
+
+with col2:
+    if st.button("🔄 Ripristina Sessione Predefinita", type="secondary"):
+        user_email = st.session_state.get('user_email')
+        clear_session(user_email)
+        st.session_state.messages = []
+        st.session_state.active_model = "openai/gpt-3.5-turbo"
+        st.session_state.temperature = 0.7
+        st.success("Sessione ripristinata ai valori predefiniti.")
+        st.rerun()
 
 # Mostra i parametri attuali dell'URL
 st.caption("URL per condividere questa configurazione:")

@@ -3,6 +3,7 @@ from utils.auth import require_login, logout
 from utils.api import get_openrouter_client
 from utils.permissions import get_role_permissions, get_daily_limit
 from utils.user_management import get_message_count_today
+from utils.session_persistence import load_session, save_session
 
 # Configurazione base della pagina
 st.set_page_config(
@@ -11,15 +12,26 @@ st.set_page_config(
     layout="wide"
 )
 
-# Inizializzazione session_state globale
-if "messages" not in st.session_state:
-    st.session_state["messages"] = []
+# Gestione Autenticazione (Blocca se non autenticato)
+require_login()
 
-# Sincronizzazione INIZIALE URL -> Session State
+# Se siamo qui, l'utente è autenticato.
+user_email = st.session_state.get('user_email', 'User')
+user_role = st.session_state.get('user_role', 'user')
+
+# Caricamento della sessione persistente
+if "session_loaded" not in st.session_state:
+    session_data = load_session(user_email)
+    st.session_state["messages"] = session_data.get("messages", [])
+    st.session_state["active_model"] = session_data.get("active_model", "openai/gpt-3.5-turbo")
+    st.session_state["temperature"] = session_data.get("temperature", 0.7)
+    st.session_state["session_loaded"] = True
+
+# Sincronizzazione INIZIALE URL -> Session State (sovrascrivi solo se parametri presenti)
 qp = st.query_params
-if "active_model" not in st.session_state:
+if "model" in qp:
     st.session_state["active_model"] = qp.get("model", "openai/gpt-3.5-turbo")
-if "temperature" not in st.session_state:
+if "temp" in qp:
     try:
         st.session_state["temperature"] = float(qp.get("temp", 0.7))
     except ValueError:
@@ -30,13 +42,6 @@ st.query_params.update({
     "model": st.session_state.get("active_model", "openai/gpt-3.5-turbo"),
     "temp": str(st.session_state.get("temperature", 0.7))
 })
-
-# Gestione Autenticazione (Blocca se non autenticato)
-require_login()
-
-# Se siamo qui, l'utente è autenticato.
-user_email = st.session_state.get('user_email', 'User')
-user_role = st.session_state.get('user_role', 'user')
 
 # Mostra info utente nella sidebar
 st.sidebar.divider()
@@ -54,6 +59,18 @@ if daily_limit:
 if st.sidebar.button("🚪 Logout"):
     logout()
 st.sidebar.divider()
+
+# Pulsante per salvare manualmente la sessione (opzionale)
+if st.sidebar.button("💾 Salva Sessione"):
+    session_data = {
+        "messages": st.session_state.get("messages", []),
+        "active_model": st.session_state.get("active_model", "openai/gpt-3.5-turbo"),
+        "temperature": st.session_state.get("temperature", 0.7)
+    }
+    if save_session(user_email, session_data):
+        st.sidebar.success("✅ Sessione salvata!")
+    else:
+        st.sidebar.error("❌ Errore nel salvataggio della sessione")
 
 # Inizializziamo il client API in modo che sia disponibile ovunque
 if "api_client" not in st.session_state:
