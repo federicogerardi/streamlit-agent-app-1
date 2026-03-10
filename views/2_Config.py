@@ -42,13 +42,17 @@ def update_query_params():
 st.header("Modello")
 
 # 1. Scelta Modello
+# Inizializza active_model se non esiste
+if "active_model" not in st.session_state:
+    st.session_state.active_model = "openai/gpt-3.5-turbo"
+
 # Se st.session_state.active_model non e' nella lista (improbabile ma possibile), default base
 try:
     default_index = available_models.index(st.session_state.active_model)
 except ValueError:
     default_index = 0
 
-selected_model = st.selectbox(
+st.selectbox(
     "Seleziona il Modello LLM",
     options=available_models,
     index=default_index,
@@ -57,12 +61,15 @@ selected_model = st.selectbox(
 )
 
 # 2. Temperatura
+# Inizializza temperature se non esiste
+if "temperature" not in st.session_state:
+    st.session_state.temperature = 0.7
+
 st.header("Parametri")
-temp = st.slider(
+st.slider(
     "Temperatura",
     min_value=0.0,
     max_value=2.0,
-    value=st.session_state.temperature,
     step=0.1,
     key="temperature",
     on_change=update_query_params,
