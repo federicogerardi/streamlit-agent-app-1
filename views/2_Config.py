@@ -127,7 +127,7 @@ if user_role == "admin":
                         "Ultimo Login": info.get("last_login", "N/A")[:10] if info.get("last_login") else "Mai"
                     })
                 
-                st.dataframe(user_data, use_container_width=True)
+                st.dataframe(user_data, width='stretch')
                 
                 # Cambio ruolo utente
                 st.subheader("Cambia Ruolo Utente")

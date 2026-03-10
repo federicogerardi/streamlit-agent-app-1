@@ -38,6 +38,10 @@ env/
 # Documentation (local only)
 docs/
 
+# Project Memory (local development only)
+memory/
+/memories/
+
 # IDE
 .vscode/
 .idea/
