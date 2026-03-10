@@ -207,17 +207,7 @@ Per deploy su Streamlit Cloud:
 
 **Nota:** Aggiorna `redirect_uri` in Google OAuth2 e `secrets.toml` con URL di produzione.
 
-## 📄 Licenza
 
-[Specifica la licenza del progetto]
-
-## 👨‍💻 Autore
-
-[Informazioni autore]
-
-## 🤝 Contributi
-
-[Istruzioni per contributi, se applicabile]
 
 ---
 
